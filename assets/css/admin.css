@@ -1,0 +1,45 @@
+.infinitepay-admin-verify {
+  margin-top: 12px;
+}
+
+.infinitepay-verify-btn {
+  background: #7b2d8b;
+  color: #fff;
+  border-color: #6a2579;
+}
+
+.infinitepay-verify-btn:hover {
+  background: #6a2579;
+  color: #fff;
+}
+
+.infinitepay-verify-result {
+  font-style: italic;
+  color: #555;
+}
+
+/* Status page table */
+.wc_status_table td:first-child {
+  font-weight: 600;
+}
+
+/* Settings: color picker preview */
+.infinitepay-color-preview {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+
+/* Settings: logo preview */
+.infinitepay-logo-preview img {
+  max-width: 200px;
+  max-height: 80px;
+  display: block;
+  margin-top: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}

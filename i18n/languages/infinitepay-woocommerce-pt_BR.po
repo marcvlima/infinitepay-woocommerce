@@ -1,0 +1,213 @@
+# Copyright (C) 2024 Marcus Lima
+# This file is distributed under the GPL-2.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: InfinitePay for WooCommerce 1.0.0\n"
+"Report-Msgid-Bugs-To: https://github.com/marcvlima/infinitepay-woocommerce/issues\n"
+"POT-Creation-Date: 2024-01-01 00:00+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2024-01-01 00:00+0000\n"
+"Last-Translator: Marcus Lima\n"
+"Language-Team: Portuguese (Brazil)\n"
+"Language: pt_BR\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Enable/Disable"
+msgstr "Ativar/Desativar"
+
+msgid "Enable InfinitePay"
+msgstr "Ativar InfinitePay"
+
+msgid "Title"
+msgstr "Título"
+
+msgid "Payment method title shown to the customer."
+msgstr "Título do método de pagamento exibido ao cliente."
+
+msgid "Pague com InfinitePay"
+msgstr "Pague com InfinitePay"
+
+msgid "Description"
+msgstr "Descrição"
+
+msgid "InfiniteTag (handle)"
+msgstr "InfiniteTag (handle)"
+
+msgid "Your InfiniteTag without the $ sign."
+msgstr "Sua InfiniteTag sem o cifrão ($)."
+
+msgid "Debug"
+msgstr "Debug"
+
+msgid "Enable debug logging"
+msgstr "Ativar log de debug"
+
+msgid "InfinitePay Checkout"
+msgstr "InfinitePay Checkout"
+
+msgid "Receba pagamentos via InfinitePay Checkout Integrado."
+msgstr "Receba pagamentos via InfinitePay Checkout Integrado."
+
+msgid "Pague com Pix"
+msgstr "Pague com Pix"
+
+msgid "Pagamento instantâneo via Pix. O QR Code será gerado após o redirecionamento."
+msgstr "Pagamento instantâneo via Pix. O QR Code será gerado após o redirecionamento."
+
+msgid "InfinitePay Pix"
+msgstr "InfinitePay Pix"
+
+msgid "Receba pagamentos instantâneos via Pix pela InfinitePay."
+msgstr "Receba pagamentos instantâneos via Pix pela InfinitePay."
+
+msgid "Aguardando pagamento InfinitePay."
+msgstr "Aguardando pagamento InfinitePay."
+
+msgid "Erro ao processar pagamento InfinitePay. Tente novamente."
+msgstr "Erro ao processar pagamento InfinitePay. Tente novamente."
+
+msgid "Pagamento confirmado via InfinitePay (%s)."
+msgstr "Pagamento confirmado via InfinitePay (%s)."
+
+msgid "Pagamento confirmado na página de retorno."
+msgstr "Pagamento confirmado na página de retorno."
+
+msgid "Pagamento confirmado via verificação automática InfinitePay."
+msgstr "Pagamento confirmado via verificação automática InfinitePay."
+
+msgid "Pedido cancelado automaticamente por falta de pagamento após 24h."
+msgstr "Pedido cancelado automaticamente por falta de pagamento após 24h."
+
+msgid "Verificar Pagamento na InfinitePay"
+msgstr "Verificar Pagamento na InfinitePay"
+
+msgid "Verificando..."
+msgstr "Verificando..."
+
+msgid "Pago!"
+msgstr "Pago!"
+
+msgid "Não identificado."
+msgstr "Não identificado."
+
+msgid "Pagamento confirmado!"
+msgstr "Pagamento confirmado!"
+
+msgid "Pagamento não identificado na InfinitePay."
+msgstr "Pagamento não identificado na InfinitePay."
+
+msgid "Permissão negada."
+msgstr "Permissão negada."
+
+msgid "Pedido não encontrado."
+msgstr "Pedido não encontrado."
+
+msgid "NSU não encontrado para este pedido."
+msgstr "NSU não encontrado para este pedido."
+
+msgid "Pagamento confirmado via verificação manual."
+msgstr "Pagamento confirmado via verificação manual."
+
+msgid "Ver comprovante de pagamento"
+msgstr "Ver comprovante de pagamento"
+
+msgid "Every 15 minutes"
+msgstr "A cada 15 minutos"
+
+msgid "Aguarde, você está sendo redirecionado para o pagamento..."
+msgstr "Aguarde, você está sendo redirecionado para o pagamento..."
+
+msgid "Clique aqui se não for redirecionado automaticamente"
+msgstr "Clique aqui se não for redirecionado automaticamente"
+
+msgid "Ambiente seguro InfinitePay"
+msgstr "Ambiente seguro InfinitePay"
+
+msgid "Tela de Transição"
+msgstr "Tela de Transição"
+
+msgid "Ativar tela de transição"
+msgstr "Ativar tela de transição"
+
+msgid "Exibir tela intermediária antes do redirecionamento"
+msgstr "Exibir tela intermediária antes do redirecionamento"
+
+msgid "Logo"
+msgstr "Logo"
+
+msgid "URL da imagem do logo (deixe em branco para usar o logo do site)."
+msgstr "URL da imagem do logo (deixe em branco para usar o logo do site)."
+
+msgid "Mensagem"
+msgstr "Mensagem"
+
+msgid "Texto do link de fallback"
+msgstr "Texto do link de fallback"
+
+msgid "Texto de segurança"
+msgstr "Texto de segurança"
+
+msgid "Cor de fundo"
+msgstr "Cor de fundo"
+
+msgid "Cor do texto"
+msgstr "Cor do texto"
+
+msgid "Cor de destaque"
+msgstr "Cor de destaque"
+
+msgid "Delay do redirecionamento (segundos)"
+msgstr "Delay do redirecionamento (segundos)"
+
+msgid "Handle (InfiniteTag)"
+msgstr "Handle (InfiniteTag)"
+
+msgid "Não configurado"
+msgstr "Não configurado"
+
+msgid "Conectividade API"
+msgstr "Conectividade API"
+
+msgid "URL do Webhook"
+msgstr "URL do Webhook"
+
+msgid "HPOS ativo"
+msgstr "HPOS ativo"
+
+msgid "Checkout Blocks"
+msgstr "Checkout Blocks"
+
+msgid "Modo debug"
+msgstr "Modo debug"
+
+msgid "Versão PHP"
+msgstr "Versão PHP"
+
+msgid "Cron agendado"
+msgstr "Cron agendado"
+
+msgid "Seu pagamento está sendo processado. Você receberá confirmação por e-mail."
+msgstr "Seu pagamento está sendo processado. Você receberá confirmação por e-mail."
+
+msgid "InfinitePay for WooCommerce requer o WooCommerce ativo."
+msgstr "InfinitePay for WooCommerce requer o WooCommerce ativo."
+
+msgid "InfinitePay for WooCommerce: execute \"composer install\" no diretório do plugin."
+msgstr "InfinitePay for WooCommerce: execute \"composer install\" no diretório do plugin."
+
+msgid "InfinitePay payment method"
+msgstr "Método de pagamento InfinitePay"
+
+msgid "InfinitePay did not return a payment URL."
+msgstr "A InfinitePay não retornou uma URL de pagamento."
+
+msgid "InfiniteTag handle is required."
+msgstr "O handle (InfiniteTag) é obrigatório."
+
+msgid "Order items are required."
+msgstr "Os itens do pedido são obrigatórios."
+
+msgid "Redirect URL is required."
+msgstr "A URL de redirecionamento é obrigatória."
