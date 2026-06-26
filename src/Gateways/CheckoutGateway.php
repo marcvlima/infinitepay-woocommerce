@@ -16,6 +16,7 @@ class CheckoutGateway extends AbstractGateway {
 		$this->has_fields         = false;
 		$this->method_title       = __( 'InfinitePay Checkout', 'infinitepay-woocommerce' );
 		$this->method_description = __( 'Receba pagamentos via InfinitePay Checkout Integrado.', 'infinitepay-woocommerce' );
+		$this->icon               = INFINITEPAY_WC_URL . 'assets/images/infinitepay-icon.svg';
 		$this->supports           = [ 'products' ];
 
 		parent::__construct();

@@ -11,6 +11,7 @@ class PixGateway extends CheckoutGateway {
 		$this->has_fields         = false;
 		$this->method_title       = __( 'InfinitePay Pix', 'infinitepay-woocommerce' );
 		$this->method_description = __( 'Receba pagamentos instantâneos via Pix pela InfinitePay.', 'infinitepay-woocommerce' );
+		$this->icon               = INFINITEPAY_WC_URL . 'assets/images/pix-logo.svg';
 		$this->supports           = [ 'products' ];
 
 		// Skip CheckoutGateway::__construct, call AbstractGateway directly.
