@@ -93,19 +93,6 @@ class CheckoutGateway extends AbstractGateway {
 			];
 		}
 
-		$redirect_screen_enabled = isset( $settings['redirect_screen_enabled'] ) ? $settings['redirect_screen_enabled'] : 'yes';
-
-		if ( 'yes' === $redirect_screen_enabled ) {
-			add_action( 'wp_head', function () use ( $checkout_url ) {
-				( new RedirectScreen() )->render( $checkout_url );
-				exit;
-			}, 1 );
-			return [
-				'result'   => 'success',
-				'redirect' => add_query_arg( 'infinitepay_redirect', '1', home_url( '/' ) ),
-			];
-		}
-
 		return [
 			'result'   => 'success',
 			'redirect' => $checkout_url,
