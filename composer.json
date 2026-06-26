@@ -33,7 +33,8 @@
     "scripts": {
         "phpcs": "phpcs --standard=.phpcs.xml.dist",
         "phpcbf": "phpcbf --standard=.phpcs.xml.dist",
-        "phpunit": "phpunit --configuration tests/phpunit.xml"
+        "phpunit": "phpunit --configuration tests/phpunit.xml",
+        "test": "phpunit --configuration tests/phpunit.xml"
     },
     "config": {
         "allow-plugins": {
