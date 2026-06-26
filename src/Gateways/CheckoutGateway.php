@@ -50,6 +50,18 @@ class CheckoutGateway extends AbstractGateway {
 			$items[] = $item_data;
 		}
 
+		// Add shipping lines as items so the InfinitePay total matches the WC order total.
+		foreach ( $order->get_items( 'shipping' ) as $shipping_item ) {
+			$shipping_total = (float) $shipping_item->get_total();
+			if ( $shipping_total > 0 ) {
+				$items[] = [
+					'quantity'    => 1,
+					'price'       => (int) round( $shipping_total * 100 ),
+					'description' => $shipping_item->get_name(),
+				];
+			}
+		}
+
 		// Extract street number from address_1 (e.g. "Rua X, 123" or custom field billing_number).
 		$address1 = $order->get_billing_address_1();
 		$number   = (string) $order->get_meta( '_billing_number' );
