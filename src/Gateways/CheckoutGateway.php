@@ -3,7 +3,6 @@
 namespace InfinitePay\WooCommerce\Gateways;
 
 use InfinitePay\WooCommerce\Api\CheckoutEndpoint;
-use InfinitePay\WooCommerce\Checkout\RedirectScreen;
 use InfinitePay\WooCommerce\Order\OrderHelper;
 use InfinitePay\WooCommerce\Order\OrderMetaKeys;
 
@@ -34,32 +33,55 @@ class CheckoutGateway extends AbstractGateway {
 
 		$items = [];
 		foreach ( $order->get_items() as $item ) {
-			$items[] = [
+			$product   = $item->get_product();
+			$image_url = '';
+			if ( $product ) {
+				$img_id    = $product->get_image_id();
+				$image_url = $img_id ? wp_get_attachment_image_url( $img_id, 'woocommerce_thumbnail' ) : '';
+			}
+			$item_data = [
 				'quantity'    => $item->get_quantity(),
 				'price'       => (int) round( ( $item->get_total() / $item->get_quantity() ) * 100 ),
 				'description' => $item->get_name(),
 			];
+			if ( $image_url ) {
+				$item_data['image_url'] = $image_url;
+			}
+			$items[] = $item_data;
+		}
+
+		// Extract street number from address_1 (e.g. "Rua X, 123" or custom field billing_number).
+		$address1 = $order->get_billing_address_1();
+		$number   = (string) $order->get_meta( '_billing_number' );
+		if ( ! $number ) {
+			preg_match( '/,\s*(\d+[A-Za-z]?)/', $address1, $m );
+			$number = $m[1] ?? ( $order->get_billing_address_2() ?: '0' );
 		}
 
 		$order_nsu = 'WC-' . $order_id . '-' . time();
 
 		$payload = [
-			'handle'      => $handle,
-			'order_nsu'   => $order_nsu,
-			'items'       => $items,
+			'handle'       => $handle,
+			'order_nsu'    => $order_nsu,
+			'items'        => $items,
 			'redirect_url' => $order->get_checkout_order_received_url(),
 			'webhook_url'  => rest_url( 'infinitepay/v1/webhook' ),
-			'customer'    => [
+			'customer'     => [
 				'name'         => trim( $order->get_billing_first_name() . ' ' . $order->get_billing_last_name() ),
 				'email'        => $order->get_billing_email(),
 				'phone_number' => preg_replace( '/\D/', '', $order->get_billing_phone() ),
 			],
-			'address'     => [
+			'address'      => [
 				'cep'        => preg_replace( '/\D/', '', $order->get_billing_postcode() ),
-				'number'     => $order->get_billing_address_2() ?: '0',
+				'number'     => $number,
 				'complement' => $order->get_billing_address_2(),
 			],
 		];
+
+		$store_name = trim( (string) $this->get_option( 'store_name' ) );
+		if ( $store_name ) {
+			$payload['merchant'] = [ 'name' => $store_name ];
+		}
 
 		$result = $endpoint->create_link( $payload );
 
