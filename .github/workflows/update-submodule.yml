@@ -1,0 +1,27 @@
+name: Update submodule in site repo
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  update-submodule:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout site repo
+        uses: actions/checkout@v4
+        with:
+          repository: marcvlima/arabianmirage_wordpress
+          token: ${{ secrets.SITE_REPO_TOKEN }}
+          submodules: true
+
+      - name: Update submodule pointer
+        run: |
+          git submodule update --remote wp-content/plugins/infinitepay-woocommerce
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add wp-content/plugins/infinitepay-woocommerce
+          git diff --staged --quiet && echo "No changes" && exit 0
+          PLUGIN_SHA=$(cd wp-content/plugins/infinitepay-woocommerce && git rev-parse --short HEAD)
+          git commit -m "chore: update infinitepay-woocommerce to ${PLUGIN_SHA}"
+          git push
