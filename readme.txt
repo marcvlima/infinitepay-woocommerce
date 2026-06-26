@@ -67,6 +67,13 @@ Sim, compatível com WooCommerce Blocks.
 = O que acontece se o webhook não chegar? =
 O plugin verifica pedidos pendentes via cron a cada 15 minutos e também faz double-check quando o cliente retorna à loja.
 
+== Screenshots ==
+
+1. Tela de configuração do gateway no painel WooCommerce
+2. Tela de transição customizável exibida ao cliente
+3. Página de pedido no admin com botão "Verificar Pagamento"
+4. Status Page em WooCommerce → Status do Sistema
+
 == Changelog ==
 
 = 1.0.0 =

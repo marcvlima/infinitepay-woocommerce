@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1544 500" width="1544" height="500">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a1a"/>
+      <stop offset="100%" style="stop-color:#1a1a3e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00c853"/>
+      <stop offset="100%" style="stop-color:#00e676"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1544" height="500" fill="url(#bg)"/>
+
+  <!-- Decorative circles -->
+  <circle cx="1350" cy="80" r="220" fill="none" stroke="#00c853" stroke-width="1" opacity="0.15"/>
+  <circle cx="1350" cy="80" r="160" fill="none" stroke="#00c853" stroke-width="1" opacity="0.12"/>
+  <circle cx="1350" cy="80" r="100" fill="none" stroke="#00c853" stroke-width="1" opacity="0.1"/>
+  <circle cx="180" cy="420" r="180" fill="none" stroke="#00c853" stroke-width="1" opacity="0.08"/>
+
+  <!-- Green accent bar -->
+  <rect x="80" y="160" width="6" height="180" rx="3" fill="url(#accent)"/>
+
+  <!-- Plugin name -->
+  <text x="114" y="232" font-family="'Helvetica Neue', Arial, sans-serif" font-size="72" font-weight="700" fill="#ffffff" letter-spacing="-1">InfinitePay</text>
+  <text x="114" y="310" font-family="'Helvetica Neue', Arial, sans-serif" font-size="72" font-weight="300" fill="#00e676" letter-spacing="-1">for WooCommerce</text>
+
+  <!-- Tagline -->
+  <text x="116" y="368" font-family="'Helvetica Neue', Arial, sans-serif" font-size="26" font-weight="400" fill="#aaaacc" letter-spacing="0.5">Checkout Integrado via InfiniteTag — sem API Key</text>
+
+  <!-- Feature pills -->
+  <rect x="116" y="400" width="70" height="30" rx="15" fill="#00c853" opacity="0.2"/>
+  <text x="151" y="420" font-family="Arial, sans-serif" font-size="13" fill="#00e676" text-anchor="middle">Pix</text>
+
+  <rect x="198" y="400" width="130" height="30" rx="15" fill="#00c853" opacity="0.2"/>
+  <text x="263" y="420" font-family="Arial, sans-serif" font-size="13" fill="#00e676" text-anchor="middle">Cartão de Crédito</text>
+
+  <rect x="340" y="400" width="60" height="30" rx="15" fill="#00c853" opacity="0.2"/>
+  <text x="370" y="420" font-family="Arial, sans-serif" font-size="13" fill="#00e676" text-anchor="middle">HPOS</text>
+
+  <rect x="412" y="400" width="80" height="30" rx="15" fill="#00c853" opacity="0.2"/>
+  <text x="452" y="420" font-family="Arial, sans-serif" font-size="13" fill="#00e676" text-anchor="middle">Blocks</text>
+
+  <!-- IP monogram mark (right side) -->
+  <g transform="translate(1180, 180)">
+    <rect width="200" height="200" rx="40" fill="#00c853" opacity="0.12"/>
+    <rect x="10" y="10" width="180" height="180" rx="32" fill="none" stroke="#00c853" stroke-width="1.5" opacity="0.3"/>
+    <text x="100" y="130" font-family="'Helvetica Neue', Arial, sans-serif" font-size="100" font-weight="800" fill="url(#accent)" text-anchor="middle" opacity="0.9">IP</text>
+  </g>
+</svg>
