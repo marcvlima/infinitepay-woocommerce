@@ -78,10 +78,6 @@ class CheckoutGateway extends AbstractGateway {
 			],
 		];
 
-		$store_name = trim( (string) $this->get_option( 'store_name' ) );
-		if ( $store_name ) {
-			$payload['merchant'] = [ 'name' => $store_name ];
-		}
 
 		$result = $endpoint->create_link( $payload );
 

@@ -53,13 +53,6 @@ abstract class AbstractGateway extends WC_Payment_Gateway {
 				'default'     => '',
 				'desc_tip'    => true,
 			],
-			'store_name'  => [
-				'title'       => __( 'Nome da loja no checkout', 'infinitepay-woocommerce' ),
-				'type'        => 'text',
-				'description' => __( 'Nome exibido na página de pagamento InfinitePay. Deixe vazio para usar o padrão da conta.', 'infinitepay-woocommerce' ),
-				'default'     => '',
-				'desc_tip'    => true,
-			],
 			'debug'       => [
 				'title'   => __( 'Debug', 'infinitepay-woocommerce' ),
 				'type'    => 'checkbox',
