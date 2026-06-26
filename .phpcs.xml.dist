@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<ruleset name="InfinitePay WooCommerce">
+    <description>Coding standards for InfinitePay WooCommerce plugin.</description>
+
+    <file>.</file>
+
+    <exclude-pattern>/vendor/*</exclude-pattern>
+    <exclude-pattern>/tests/*</exclude-pattern>
+    <exclude-pattern>/node_modules/*</exclude-pattern>
+
+    <arg name="basepath" value="."/>
+    <arg name="extensions" value="php"/>
+    <arg name="parallel" value="8"/>
+    <arg value="sp"/>
+
+    <rule ref="WordPress-Extra">
+        <exclude name="WordPress.Files.FileName.InvalidClassFileName"/>
+        <exclude name="WordPress.Files.FileName.NotHyphenatedLowercase"/>
+    </rule>
+
+    <rule ref="WordPress-Docs"/>
+
+    <rule ref="WordPress.WP.I18n">
+        <properties>
+            <property name="text_domain" type="array" value="infinitepay-woocommerce"/>
+        </properties>
+    </rule>
+
+    <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+        <properties>
+            <property name="prefixes" type="array" value="infinitepay,InfinitePay,INFINITEPAY"/>
+        </properties>
+    </rule>
+
+    <config name="minimum_supported_wp_version" value="6.4"/>
+    <config name="testVersion" value="7.4-"/>
+</ruleset>
