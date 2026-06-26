@@ -33,6 +33,29 @@ Aceite pagamentos via InfinitePay diretamente no seu WooCommerce usando apenas s
 4. Acesse **WooCommerce → Configurações → Pagamentos → InfinitePay Checkout**
 5. Insira sua InfiniteTag (sem o `$`) e salve
 
+== External Services ==
+
+Este plugin se comunica com a API da **InfinitePay** para processar pagamentos. Os dados são enviados nos seguintes momentos:
+
+1. **Criação do link de pagamento** — ao finalizar uma compra, os dados do pedido (itens, valor, endereço, e-mail do cliente) são enviados para `https://api.checkout.infinitepay.io/links` para gerar a URL de pagamento.
+
+2. **Verificação de pagamento** — para confirmar se um pagamento foi concluído, o plugin consulta `https://api.checkout.infinitepay.io/payment_check` com o identificador do pedido (`order_nsu`) e o handle do lojista.
+
+**Dados transmitidos à InfinitePay:**
+* Identificador do pedido (order_nsu)
+* InfiniteTag do lojista (handle)
+* Itens do pedido (nome, quantidade, valor)
+* Nome, e-mail e telefone do cliente
+* Endereço de entrega/cobrança (CEP, número, complemento)
+* URL de retorno e URL do webhook
+
+**Nenhum dado de cartão de crédito passa pelo servidor do lojista.** O checkout de pagamento é hospedado integralmente pela InfinitePay.
+
+* Serviço: InfinitePay
+* Site: https://infinitepay.io
+* Termos de uso: https://infinitepay.io/termos-de-uso
+* Política de privacidade: https://infinitepay.io/politica-de-privacidade
+
 == Frequently Asked Questions ==
 
 = Preciso gerar uma API Key? =
