@@ -59,16 +59,25 @@ class CronChecker {
 			}
 
 			if ( ! empty( $check['paid'] ) ) {
+				if ( ! empty( $check['capture_method'] ) ) {
+					OrderHelper::save_infinitepay_meta( $order, [ 'CAPTURE_METHOD' => (string) $check['capture_method'] ] );
+				}
 				OrderHelper::mark_as_processing( $order, __( 'Pagamento confirmado via verificação automática InfinitePay.', 'infinitepay-woocommerce' ) );
 				$this->logger->info( 'CronChecker: order #' . $order->get_id() . ' marked as processing.' );
 				continue;
 			}
 
-			// Cancel orders pending for more than 24 hours.
+			// Cancelamento após 24h — SOMENTE se temos transaction_nsu + slug para verificar
+			// de fato. Sem eles, o /payment_check não consegue confirmar e cancelar poderia
+			// descartar um pedido pago. Nesse caso, apenas alerta para revisão manual.
 			$created = $order->get_date_created();
 			if ( $created && ( time() - $created->getTimestamp() ) > DAY_IN_SECONDS ) {
-				OrderHelper::mark_as_cancelled( $order, __( 'Pedido cancelado automaticamente por falta de pagamento após 24h.', 'infinitepay-woocommerce' ) );
-				$this->logger->info( 'CronChecker: order #' . $order->get_id() . ' cancelled after 24h.' );
+				if ( $transaction_nsu && $invoice_slug ) {
+					OrderHelper::mark_as_cancelled( $order, __( 'Pedido cancelado automaticamente por falta de pagamento após 24h.', 'infinitepay-woocommerce' ) );
+					$this->logger->info( 'CronChecker: order #' . $order->get_id() . ' cancelled after 24h.' );
+				} else {
+					$this->logger->warning( 'CronChecker: order #' . $order->get_id() . ' pendente >24h sem transaction_nsu/slug — requer revisão manual (não cancelado automaticamente).' );
+				}
 			}
 		}
 	}

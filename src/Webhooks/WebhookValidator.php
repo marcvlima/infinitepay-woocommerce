@@ -18,9 +18,9 @@ class WebhookValidator {
 	}
 
 	/**
-	 * Validates webhook payload structure, order existence, and idempotency.
-	 * Amount verification is intentionally left to WebhookHandler (from the payload)
-	 * to avoid a synchronous back-call to /payment_check that can fail independently.
+	 * Valida estrutura do payload, existência do pedido, método e idempotência.
+	 * Não faz back-call ao /payment_check — a verificação de valor é feita pelo
+	 * WebhookHandler a partir do paid_amount do próprio payload.
 	 *
 	 * @return WC_Order|WP_Error
 	 */
