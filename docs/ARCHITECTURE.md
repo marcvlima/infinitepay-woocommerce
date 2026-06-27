@@ -37,7 +37,7 @@ infinitepay-woocommerce/
 │   │   └── AdminVerifyButton.php Manual verify button in order screen
 │   ├── Webhooks/
 │   │   ├── WebhookHandler.php    REST POST /infinitepay/v1/webhook
-│   │   └── WebhookValidator.php  Payload validation + amount check
+│   │   └── WebhookValidator.php  Payload structure + order lookup
 │   └── Logger.php                WC logger wrapper, masks handle
 ├── assets/
 │   ├── css/redirect-screen.css
@@ -54,6 +54,18 @@ infinitepay-woocommerce/
 
 ---
 
+## Identificadores de pagamento
+
+| Identificador | Quem cria | Exemplo | Uso |
+|---|---|---|---|
+| **WC Order ID** | WooCommerce | `191` | Chave primária do pedido no banco |
+| **order_nsu** | Plugin | `WC-191-1750978260` | Enviado no `POST /links`; liga o pedido WC ao link InfinitePay |
+| **handle** | Conta InfinitePay | `arabianmirage` | InfiniteTag sem o `$`; identifica o vendedor em todos os endpoints |
+| **transaction_nsu** | InfinitePay | `550e8400-e29b-...` | UUID gerado pela InfinitePay ao processar o pagamento; retornado no webhook e na redirect_url |
+| **invoice_slug** | InfinitePay | `abc123` | Código da fatura; retornado no webhook e na redirect_url |
+
+---
+
 ## Payment Flow
 
 ```mermaid
@@ -63,15 +75,16 @@ sequenceDiagram
     participant IP as InfinitePay API
 
     C->>WC: Place order
-    WC->>IP: POST /links (handle, items, order_nsu, redirect_url, webhook_url)
+    WC->>IP: POST /links (handle, order_nsu, items, redirect_url, webhook_url)
     IP-->>WC: { url: "https://checkout.infinitepay.io/..." }
-    WC->>C: Redirect (transition screen or modal)
-    C->>IP: Complete payment
-    IP->>WC: POST /wp-json/infinitepay/v1/webhook
-    WC->>IP: POST /payment_check (double-check)
-    IP-->>WC: { paid: true, paid_amount: ... }
+    WC->>C: Redirect to InfinitePay checkout
+    C->>IP: Complete payment (Pix, credit card, etc.)
+    IP->>WC: POST /wp-json/infinitepay/v1/webhook\n{ order_nsu, transaction_nsu, paid_amount, ... }
+    WC->>WC: Validate order + save meta + check paid_amount
     WC->>WC: mark_as_processing()
     WC->>C: Order confirmation email
+    IP->>C: Redirect to redirect_url?transaction_nsu=...&slug=...
+    Note over WC: ReturnHandler fires on thank-you page\nas a secondary confirmation path
 ```
 
 ---
@@ -81,19 +94,29 @@ sequenceDiagram
 ```mermaid
 flowchart TD
     A[Order placed — status: pending] --> B{Webhook received?}
-    B -- Yes --> C[WebhookValidator]
-    C --> D{Valid + paid?}
-    D -- Yes --> E[mark_as_processing ✅]
-    D -- No --> F[Log + return 400]
-    B -- No --> G{Customer returns\nto thank-you page?}
-    G -- Yes --> H[ReturnHandler double-check]
-    H --> D
-    G -- No --> I{Cron runs\nevery 15 min}
-    I --> J[CronChecker checks\nall pending orders]
-    J --> D
-    J --> K{Pending > 24h?}
-    K -- Yes --> L[mark_as_cancelled ❌]
-    K -- No --> M[Keep pending, check again]
+
+    B -- Yes --> C[WebhookValidator\ncheck order + method + idempotency]
+    C --> D{Order found\n& still pending?}
+    D -- No --> F[Return 400 — order not found\nor wrong method]
+    D -- Yes --> G[Save meta immediately\ntransaction_nsu / invoice_slug / etc.]
+    G --> H{paid_amount in payload\n≥ order total?}
+    H -- Yes --> E[mark_as_processing ✅\nReturn 200]
+    H -- No --> I[Schedule cron check +30s\nReturn 200]
+
+    B -- No --> J{Customer returns\nto thank-you page?}
+    J -- Yes --> K[ReturnHandler\nPOST /payment_check\nwith order_nsu + transaction_nsu from URL]
+    K --> L{paid?}
+    L -- Yes --> E
+    L -- No --> M[Keep pending]
+
+    J -- No --> N{Cron runs\nevery 15 min}
+    I --> N
+    N --> O[CronChecker checks all pending orders\nPOST /payment_check per order\nusing stored order_nsu + transaction_nsu]
+    O --> P{paid?}
+    P -- Yes --> E
+    P -- No --> Q{Pending > 24h?}
+    Q -- Yes --> R[mark_as_cancelled ❌]
+    Q -- No --> S[Keep pending, check again]
 ```
 
 ---
@@ -124,7 +147,7 @@ classDiagram
         +create_link(payload) array|WP_Error
     }
     class PaymentCheckEndpoint {
-        +check(handle, order_nsu, ...) array|WP_Error
+        +check(handle, order_nsu, transaction_nsu, invoice_slug) array|WP_Error
     }
     class WebhookValidator {
         +validate(payload) WC_Order|WP_Error
@@ -159,8 +182,8 @@ classDiagram
     CheckoutEndpoint --> Client
     PaymentCheckEndpoint --> Client
     WebhookHandler --> WebhookValidator
-    WebhookValidator --> PaymentCheckEndpoint
     WebhookValidator --> OrderHelper
+    WebhookHandler --> OrderHelper
     CronChecker --> PaymentCheckEndpoint
     CronChecker --> OrderHelper
     ReturnHandler --> PaymentCheckEndpoint
@@ -175,7 +198,10 @@ classDiagram
 
 - **HPOS-compatible** — todo acesso a meta via `$order->get_meta()` / `update_meta_data()`, nunca `get_post_meta()`
 - **Idempotent webhook** — pedidos já em `processing`/`completed` retornam HTTP 200 sem reprocessar
+- **Webhook sem back-call** — o `WebhookHandler` valida o `paid_amount` diretamente do payload InfinitePay; não faz chamada de saída para `/payment_check` durante o webhook, eliminando o risco de deadlock por timeout ou falha de rede
+- **Meta salvo imediatamente no webhook** — `transaction_nsu`, `invoice_slug` e demais campos são gravados antes de qualquer validação de valor, para que `CronChecker`, `ReturnHandler` e `AdminVerifyButton` possam usá-los nas verificações posteriores
 - **Amount tolerance** — tolerância de 1 centavo entre `paid_amount` e total do pedido (arredondamento)
+- **Fallback por cron quando paid_amount ausente** — se o webhook não incluir `paid_amount` válido, o handler retorna 200 (para evitar retry desnecessário da InfinitePay) e agenda verificação via `/payment_check` em 30 segundos
 - **Handle masking** — Logger mascara a InfiniteTag em todos os logs (mostra 3 chars + `***`)
 - **No card data** — o plugin nunca manipula dados de cartão; o checkout hospedado da InfinitePay faz isso
-- **Triple payment recovery** — webhook + return handler + cron garantem que nenhum pagamento fica sem confirmação
+- **Triple payment recovery** — webhook + return handler + cron garantem que nenhum pagamento fica sem confirmação; `CronChecker` e `AdminVerifyButton` usam `transaction_nsu` armazenado no meta quando disponível, aumentando a taxa de sucesso na verificação via `/payment_check`

@@ -77,7 +77,7 @@ add_action( 'plugins_loaded', function () {
 	$payment_check = new PaymentCheckEndpoint( $client );
 
 	// REST webhook.
-	$validator = new WebhookValidator( $payment_check, $logger, $handle );
+	$validator = new WebhookValidator( $logger );
 	$webhook   = new WebhookHandler( $validator, $logger );
 	add_action( 'rest_api_init', [ $webhook, 'register_routes' ] );
 

@@ -86,7 +86,10 @@ class AdminVerifyButton {
 			wp_send_json_error( [ 'message' => __( 'NSU não encontrado para este pedido.', 'infinitepay-woocommerce' ) ] );
 		}
 
-		$check = $this->payment_check->check( $this->handle, $order_nsu );
+		$transaction_nsu = OrderHelper::get_meta( $order, OrderMetaKeys::TRANSACTION_NSU );
+		$invoice_slug    = OrderHelper::get_meta( $order, OrderMetaKeys::INVOICE_SLUG );
+
+		$check = $this->payment_check->check( $this->handle, $order_nsu, $transaction_nsu, $invoice_slug );
 
 		if ( is_wp_error( $check ) ) {
 			wp_send_json_error( [ 'message' => $check->get_error_message() ] );
@@ -97,6 +100,16 @@ class AdminVerifyButton {
 			wp_send_json_success( [ 'paid' => true, 'status' => 'processing', 'message' => __( 'Pagamento confirmado!', 'infinitepay-woocommerce' ) ] );
 		}
 
-		wp_send_json_error( [ 'message' => __( 'Pagamento não identificado na InfinitePay.', 'infinitepay-woocommerce' ) ] );
+		$lines = [
+			'order_nsu: ' . $order_nsu,
+			'handle: ' . ( $this->handle ?: '(não configurado)' ),
+		];
+		if ( $transaction_nsu ) {
+			$lines[] = 'transaction_nsu: ' . $transaction_nsu;
+		}
+		wp_send_json_error( [ 'message' =>
+			__( 'Pagamento não identificado na InfinitePay.', 'infinitepay-woocommerce' )
+			. ' [' . implode( ' | ', $lines ) . ']'
+		] );
 	}
 }
