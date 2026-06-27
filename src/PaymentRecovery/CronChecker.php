@@ -48,7 +48,10 @@ class CronChecker {
 				continue;
 			}
 
-			$check = $this->payment_check->check( $this->handle, $order_nsu );
+			$transaction_nsu = OrderHelper::get_meta( $order, OrderMetaKeys::TRANSACTION_NSU );
+			$invoice_slug    = OrderHelper::get_meta( $order, OrderMetaKeys::INVOICE_SLUG );
+
+			$check = $this->payment_check->check( $this->handle, $order_nsu, $transaction_nsu, $invoice_slug );
 
 			if ( is_wp_error( $check ) ) {
 				$this->logger->warning( 'CronChecker: error checking order #' . $order->get_id() . ': ' . $check->get_error_message() );

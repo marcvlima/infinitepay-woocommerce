@@ -44,13 +44,14 @@ class WebhookHandler {
 		$order = $this->validator->validate( $payload );
 
 		if ( is_wp_error( $order ) ) {
-			$code = $order->get_error_code();
-			// Idempotency — already paid is not an error from InfinitePay's perspective.
+			$code   = $order->get_error_code();
 			$status = 'infinitepay_already_paid' === $code ? 200 : 400;
 			$this->logger->warning( 'Webhook rejected: ' . $order->get_error_message() );
 			return new WP_REST_Response( [ 'success' => false, 'message' => $order->get_error_message() ], $status );
 		}
 
+		// Save meta immediately — captures transaction_nsu/invoice_slug for later use
+		// by AdminVerifyButton, CronChecker, and ReturnHandler.
 		OrderHelper::save_infinitepay_meta(
 			$order,
 			[
@@ -62,15 +63,27 @@ class WebhookHandler {
 			]
 		);
 
-		$capture_method = isset( $payload['capture_method'] ) ? $payload['capture_method'] : 'checkout';
-		OrderHelper::mark_as_processing( $order, sprintf(
-			__( 'Pagamento confirmado via InfinitePay (%s).', 'infinitepay-woocommerce' ),
-			$capture_method
-		) );
+		$paid_amount       = isset( $payload['paid_amount'] ) ? (int) $payload['paid_amount'] : 0;
+		$order_total_cents = (int) round( $order->get_total() * 100 );
 
-		do_action( 'infinitepay_payment_confirmed', $order, $payload );
-
-		$this->logger->info( 'Webhook processed: order #' . $order->get_id() );
+		if ( $paid_amount > 0 && $paid_amount >= ( $order_total_cents - 1 ) ) {
+			$capture_method = isset( $payload['capture_method'] ) ? $payload['capture_method'] : 'checkout';
+			OrderHelper::mark_as_processing( $order, sprintf(
+				__( 'Pagamento confirmado via InfinitePay (%s).', 'infinitepay-woocommerce' ),
+				$capture_method
+			) );
+			do_action( 'infinitepay_payment_confirmed', $order, $payload );
+			$this->logger->info( 'Webhook processed: order #' . $order->get_id() );
+		} else {
+			// paid_amount absent or below expected total — acknowledge receipt and let cron verify.
+			$this->logger->warning( sprintf(
+				'Webhook: paid_amount mismatch for order #%d (expected %d cents, got %d). Cron check scheduled.',
+				$order->get_id(),
+				$order_total_cents,
+				$paid_amount
+			) );
+			wp_schedule_single_event( time() + 30, 'infinitepay_check_pending_payments' );
+		}
 
 		return new WP_REST_Response( [ 'success' => true, 'message' => null ], 200 );
 	}
