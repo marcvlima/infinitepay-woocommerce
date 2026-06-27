@@ -33,11 +33,11 @@ infinitepay-woocommerce/
 │   │   └── OrderHelper.php       HPOS-safe order helpers
 │   ├── PaymentRecovery/
 │   │   ├── CronChecker.php       15-min cron job
-│   │   ├── ReturnHandler.php     Thank-you page double-check
+│   │   ├── ReturnHandler.php     Thank-you page double-check + status banner
 │   │   └── AdminVerifyButton.php Manual verify button in order screen
 │   ├── Webhooks/
 │   │   ├── WebhookHandler.php    REST POST /infinitepay/v1/webhook
-│   │   └── WebhookValidator.php  Payload structure + order lookup
+│   │   └── WebhookValidator.php  Payload validation (structure + idempotency)
 │   └── Logger.php                WC logger wrapper, masks handle
 ├── assets/
 │   ├── css/redirect-screen.css
@@ -54,15 +54,33 @@ infinitepay-woocommerce/
 
 ---
 
-## Identificadores de pagamento
+## Identifiers
 
-| Identificador | Quem cria | Exemplo | Uso |
+| Identifier | Created by | Example | Where it appears |
 |---|---|---|---|
-| **WC Order ID** | WooCommerce | `191` | Chave primária do pedido no banco |
-| **order_nsu** | Plugin | `WC-191-1750978260` | Enviado no `POST /links`; liga o pedido WC ao link InfinitePay |
-| **handle** | Conta InfinitePay | `arabianmirage` | InfiniteTag sem o `$`; identifica o vendedor em todos os endpoints |
-| **transaction_nsu** | InfinitePay | `550e8400-e29b-...` | UUID gerado pela InfinitePay ao processar o pagamento; retornado no webhook e na redirect_url |
-| **invoice_slug** | InfinitePay | `abc123` | Código da fatura; retornado no webhook e na redirect_url |
+| WC Order ID | WooCommerce | `192` | WC order key |
+| `order_nsu` | Plugin | `WC-192-1782528492` | `POST /links` body; saved to order meta; `WC-{id}-{unix_timestamp}` makes each payment attempt unique |
+| `handle` | InfinitePay account | `lucas-souza-tdo` | InfiniteTag without `$`; identifies the merchant in every API call |
+| `transaction_nsu` | InfinitePay | `e0bc15b7-3c30-4898-b33a-765a85e6b4b3` | Redirect query string + webhook payload (same value) |
+| `slug` / `invoice_slug` | InfinitePay | `UMaS4Sotxo` | Invoice code — **name varies by surface** (see gotcha below) |
+
+### ⚠️ slug vs invoice_slug — InfinitePay naming inconsistency
+
+InfinitePay uses different field names for the same invoice code depending on the surface:
+
+| Surface | Field name |
+|---|---|
+| Webhook payload | `invoice_slug` |
+| Redirect query string | `slug` |
+| `/payment_check` request body | `slug` |
+
+The plugin stores it internally as `_infinitepay_invoice_slug` (meta key `INVOICE_SLUG`),
+but sends it as `slug` in `/payment_check` requests. Sending `invoice_slug` returns `{"success":false}`.
+
+### transaction_id vs transaction_nsu
+
+InfinitePay sends **both** `transaction_id` and `transaction_nsu` in the redirect URL with
+**identical values**. Only `transaction_nsu` is documented. The plugin ignores `transaction_id`.
 
 ---
 
@@ -75,16 +93,15 @@ sequenceDiagram
     participant IP as InfinitePay API
 
     C->>WC: Place order
-    WC->>IP: POST /links (handle, order_nsu, items, redirect_url, webhook_url)
+    WC->>IP: POST /links (handle, items, order_nsu, redirect_url, webhook_url)
     IP-->>WC: { url: "https://checkout.infinitepay.io/..." }
-    WC->>C: Redirect to InfinitePay checkout
-    C->>IP: Complete payment (Pix, credit card, etc.)
-    IP->>WC: POST /wp-json/infinitepay/v1/webhook\n{ order_nsu, transaction_nsu, paid_amount, ... }
-    WC->>WC: Validate order + save meta + check paid_amount
+    WC->>C: Redirect (transition screen or modal)
+    C->>IP: Complete payment
+    IP->>WC: POST /wp-json/infinitepay/v1/webhook (transaction_nsu, paid_amount, invoice_slug, ...)
+    WC->>WC: Save meta + validate paid_amount
     WC->>WC: mark_as_processing()
     WC->>C: Order confirmation email
-    IP->>C: Redirect to redirect_url?transaction_nsu=...&slug=...
-    Note over WC: ReturnHandler fires on thank-you page\nas a secondary confirmation path
+    IP->>C: Redirect to redirect_url (transaction_nsu, slug, capture_method, receipt_url)
 ```
 
 ---
@@ -94,29 +111,25 @@ sequenceDiagram
 ```mermaid
 flowchart TD
     A[Order placed — status: pending] --> B{Webhook received?}
-
-    B -- Yes --> C[WebhookValidator\ncheck order + method + idempotency]
-    C --> D{Order found\n& still pending?}
-    D -- No --> F[Return 400 — order not found\nor wrong method]
-    D -- Yes --> G[Save meta immediately\ntransaction_nsu / invoice_slug / etc.]
-    G --> H{paid_amount in payload\n≥ order total?}
-    H -- Yes --> E[mark_as_processing ✅\nReturn 200]
-    H -- No --> I[Schedule cron check +30s\nReturn 200]
-
+    B -- Yes --> C[WebhookValidator\nstruct + idempotency]
+    C --> D{Valid order?}
+    D -- No --> F[Log + return 400\nexcept already_paid → 200]
+    D -- Yes --> G[Save meta immediately\ntransaction_nsu, slug, capture_method]
+    G --> H{paid_amount OK?}
+    H -- Yes --> E[mark_as_processing ✅\nreturn 200]
+    H -- No --> I[Log warning\nschedule cron +30s\nreturn 200]
     B -- No --> J{Customer returns\nto thank-you page?}
-    J -- Yes --> K[ReturnHandler\nPOST /payment_check\nwith order_nsu + transaction_nsu from URL]
+    J -- Yes --> K[ReturnHandler\nPOST /payment_check\nwith slug]
     K --> L{paid?}
     L -- Yes --> E
-    L -- No --> M[Keep pending]
-
+    L -- No --> M[Show pending banner]
     J -- No --> N{Cron runs\nevery 15 min}
-    I --> N
-    N --> O[CronChecker checks all pending orders\nPOST /payment_check per order\nusing stored order_nsu + transaction_nsu]
-    O --> P{paid?}
-    P -- Yes --> E
-    P -- No --> Q{Pending > 24h?}
-    Q -- Yes --> R[mark_as_cancelled ❌]
-    Q -- No --> S[Keep pending, check again]
+    N --> O[CronChecker checks\nall pending orders]
+    O --> L
+    O --> P{Pending > 24h?}
+    P -- Yes + has slug+nsu --> Q[mark_as_cancelled ❌]
+    P -- Yes, missing ids --> R[Log warning\nmanual review]
+    P -- No --> S[Keep pending, check again]
 ```
 
 ---
@@ -147,7 +160,7 @@ classDiagram
         +create_link(payload) array|WP_Error
     }
     class PaymentCheckEndpoint {
-        +check(handle, order_nsu, transaction_nsu, invoice_slug) array|WP_Error
+        +check(handle, order_nsu, transaction_nsu, slug) array|WP_Error
     }
     class WebhookValidator {
         +validate(payload) WC_Order|WP_Error
@@ -169,6 +182,7 @@ classDiagram
     }
     class ReturnHandler {
         +handle_return(order_id) void
+        -render_status_banner(order) void
     }
     class AdminVerifyButton {
         +render_button(order) void
@@ -183,7 +197,6 @@ classDiagram
     PaymentCheckEndpoint --> Client
     WebhookHandler --> WebhookValidator
     WebhookValidator --> OrderHelper
-    WebhookHandler --> OrderHelper
     CronChecker --> PaymentCheckEndpoint
     CronChecker --> OrderHelper
     ReturnHandler --> PaymentCheckEndpoint
@@ -198,10 +211,14 @@ classDiagram
 
 - **HPOS-compatible** — todo acesso a meta via `$order->get_meta()` / `update_meta_data()`, nunca `get_post_meta()`
 - **Idempotent webhook** — pedidos já em `processing`/`completed` retornam HTTP 200 sem reprocessar
-- **Webhook sem back-call** — o `WebhookHandler` valida o `paid_amount` diretamente do payload InfinitePay; não faz chamada de saída para `/payment_check` durante o webhook, eliminando o risco de deadlock por timeout ou falha de rede
-- **Meta salvo imediatamente no webhook** — `transaction_nsu`, `invoice_slug` e demais campos são gravados antes de qualquer validação de valor, para que `CronChecker`, `ReturnHandler` e `AdminVerifyButton` possam usá-los nas verificações posteriores
+- **Webhook sem back-call** — o WebhookValidator não consulta `/payment_check`; valida apenas estrutura, existência do pedido e idempotência. A verificação de valor é feita pelo WebhookHandler com o `paid_amount` do próprio payload
+- **Meta salvo imediatamente no webhook** — `transaction_nsu`, `invoice_slug` e `capture_method` são persistidos antes de qualquer validação de valor, garantindo que o cron, botão e ReturnHandler sempre tenham os identificadores para consultar `/payment_check`
+- **`/payment_check` exige os 4 campos** — `handle`, `order_nsu`, `transaction_nsu` e `slug` são todos obrigatórios; faltando qualquer um retorna `{"success":false}`. Ver `docs/PAYMENT-CHECK-CONTRACT.md`
+- **Campo `slug` (não `invoice_slug`) no `/payment_check`** — a InfinitePay usa nomes diferentes por superfície. Validado empiricamente com pedido real
+- **`transaction_id` ignorado** — alias não-documentado do `transaction_nsu` (mesmo UUID no redirect); apenas `transaction_nsu` é usado
+- **`capture_method` persistido em todos os caminhos** — webhook, ReturnHandler, AdminVerifyButton e CronChecker salvam o método de captura (pix, credit_card...) para fins analíticos
+- **Cancelamento por cron seguro** — só cancela após 24h se `transaction_nsu` + `slug` estiverem presentes (confirmação verificável); sem eles, mantém pendente e alerta para revisão manual
 - **Amount tolerance** — tolerância de 1 centavo entre `paid_amount` e total do pedido (arredondamento)
-- **Fallback por cron quando paid_amount ausente** — se o webhook não incluir `paid_amount` válido, o handler retorna 200 (para evitar retry desnecessário da InfinitePay) e agenda verificação via `/payment_check` em 30 segundos
 - **Handle masking** — Logger mascara a InfiniteTag em todos os logs (mostra 3 chars + `***`)
 - **No card data** — o plugin nunca manipula dados de cartão; o checkout hospedado da InfinitePay faz isso
-- **Triple payment recovery** — webhook + return handler + cron garantem que nenhum pagamento fica sem confirmação; `CronChecker` e `AdminVerifyButton` usam `transaction_nsu` armazenado no meta quando disponível, aumentando a taxa de sucesso na verificação via `/payment_check`
+- **Triple payment recovery** — webhook + ReturnHandler + cron garantem que nenhum pagamento fica sem confirmação

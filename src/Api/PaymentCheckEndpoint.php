@@ -30,7 +30,7 @@ class PaymentCheckEndpoint {
 		}
 
 		if ( $slug ) {
-			$body['invoice_slug'] = $slug;
+			$body['slug'] = $slug;
 		}
 
 		$response = $this->client->post( '/payment_check', $body );

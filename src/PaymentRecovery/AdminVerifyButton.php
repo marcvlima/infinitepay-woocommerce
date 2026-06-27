@@ -58,7 +58,7 @@ class AdminVerifyButton {
 					.then(function(json){
 						result.textContent = json.data && json.data.message ? json.data.message : (json.success ? '<?php echo esc_js( __( 'Pago!', 'infinitepay-woocommerce' ) ); ?>' : '<?php echo esc_js( __( 'Não identificado.', 'infinitepay-woocommerce' ) ); ?>');
 						btn.disabled = false;
-						if(json.success){ location.reload(); }
+						if(json.success && json.data && json.data.paid){ location.reload(); }
 					});
 			});
 		})();
@@ -80,6 +80,15 @@ class AdminVerifyButton {
 			wp_send_json_error( [ 'message' => __( 'Pedido não encontrado.', 'infinitepay-woocommerce' ) ] );
 		}
 
+		// Idempotência — se já está pago, não consulta a API.
+		if ( in_array( $order->get_status(), [ 'processing', 'completed' ], true ) ) {
+			wp_send_json_success( [
+				'paid'    => true,
+				'status'  => $order->get_status(),
+				'message' => __( 'Pagamento já confirmado para este pedido.', 'infinitepay-woocommerce' ),
+			] );
+		}
+
 		$order_nsu = OrderHelper::get_meta( $order, OrderMetaKeys::ORDER_NSU );
 
 		if ( ! $order_nsu ) {
@@ -96,20 +105,23 @@ class AdminVerifyButton {
 		}
 
 		if ( ! empty( $check['paid'] ) ) {
+			if ( ! empty( $check['capture_method'] ) ) {
+				OrderHelper::save_infinitepay_meta( $order, [ 'CAPTURE_METHOD' => (string) $check['capture_method'] ] );
+			}
 			OrderHelper::mark_as_processing( $order, __( 'Pagamento confirmado via verificação manual.', 'infinitepay-woocommerce' ) );
 			wp_send_json_success( [ 'paid' => true, 'status' => 'processing', 'message' => __( 'Pagamento confirmado!', 'infinitepay-woocommerce' ) ] );
 		}
 
-		$lines = [
-			'order_nsu: ' . $order_nsu,
-			'handle: ' . ( $this->handle ?: '(não configurado)' ),
-		];
+		$diag = [ 'order_nsu: ' . $order_nsu, 'handle: ' . ( $this->handle ?: '(não configurado)' ) ];
 		if ( $transaction_nsu ) {
-			$lines[] = 'transaction_nsu: ' . $transaction_nsu;
+			$diag[] = 'transaction_nsu: ' . $transaction_nsu;
 		}
-		wp_send_json_error( [ 'message' =>
-			__( 'Pagamento não identificado na InfinitePay.', 'infinitepay-woocommerce' )
-			. ' [' . implode( ' | ', $lines ) . ']'
+		if ( $invoice_slug ) {
+			$diag[] = 'slug: ' . $invoice_slug;
+		}
+		wp_send_json_error( [
+			'message' => __( 'Pagamento não identificado na InfinitePay.', 'infinitepay-woocommerce' )
+				. ' [' . implode( ' | ', $diag ) . ']',
 		] );
 	}
 }

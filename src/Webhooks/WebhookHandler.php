@@ -4,7 +4,6 @@ namespace InfinitePay\WooCommerce\Webhooks;
 
 use InfinitePay\WooCommerce\Logger;
 use InfinitePay\WooCommerce\Order\OrderHelper;
-use InfinitePay\WooCommerce\Order\OrderMetaKeys;
 use WP_REST_Request;
 use WP_REST_Response;
 
@@ -50,16 +49,16 @@ class WebhookHandler {
 			return new WP_REST_Response( [ 'success' => false, 'message' => $order->get_error_message() ], $status );
 		}
 
-		// Save meta immediately — captures transaction_nsu/invoice_slug for later use
-		// by AdminVerifyButton, CronChecker, and ReturnHandler.
+		// Persiste os metadados imediatamente — garante transaction_nsu/slug para as
+		// verificações posteriores (cron, botão admin, página de retorno).
 		OrderHelper::save_infinitepay_meta(
 			$order,
 			[
-				'TRANSACTION_NSU' => isset( $payload['transaction_nsu'] ) ? $payload['transaction_nsu'] : '',
-				'RECEIPT_URL'     => isset( $payload['receipt_url'] ) ? $payload['receipt_url'] : '',
-				'CAPTURE_METHOD'  => isset( $payload['capture_method'] ) ? $payload['capture_method'] : '',
+				'TRANSACTION_NSU' => isset( $payload['transaction_nsu'] ) ? (string) $payload['transaction_nsu'] : '',
+				'RECEIPT_URL'     => isset( $payload['receipt_url'] ) ? (string) $payload['receipt_url'] : '',
+				'CAPTURE_METHOD'  => isset( $payload['capture_method'] ) ? (string) $payload['capture_method'] : '',
 				'INSTALLMENTS'    => isset( $payload['installments'] ) ? (string) $payload['installments'] : '',
-				'INVOICE_SLUG'    => isset( $payload['invoice_slug'] ) ? $payload['invoice_slug'] : '',
+				'INVOICE_SLUG'    => isset( $payload['invoice_slug'] ) ? (string) $payload['invoice_slug'] : '',
 			]
 		);
 
@@ -67,21 +66,28 @@ class WebhookHandler {
 		$order_total_cents = (int) round( $order->get_total() * 100 );
 
 		if ( $paid_amount > 0 && $paid_amount >= ( $order_total_cents - 1 ) ) {
-			$capture_method = isset( $payload['capture_method'] ) ? $payload['capture_method'] : 'checkout';
-			OrderHelper::mark_as_processing( $order, sprintf(
-				__( 'Pagamento confirmado via InfinitePay (%s).', 'infinitepay-woocommerce' ),
-				$capture_method
-			) );
+			$capture_method = isset( $payload['capture_method'] ) ? (string) $payload['capture_method'] : 'checkout';
+			OrderHelper::mark_as_processing(
+				$order,
+				sprintf(
+					/* translators: %s: capture method (pix, credit_card, etc.) */
+					__( 'Pagamento confirmado via InfinitePay (%s).', 'infinitepay-woocommerce' ),
+					$capture_method
+				)
+			);
 			do_action( 'infinitepay_payment_confirmed', $order, $payload );
 			$this->logger->info( 'Webhook processed: order #' . $order->get_id() );
 		} else {
-			// paid_amount absent or below expected total — acknowledge receipt and let cron verify.
-			$this->logger->warning( sprintf(
-				'Webhook: paid_amount mismatch for order #%d (expected %d cents, got %d). Cron check scheduled.',
-				$order->get_id(),
-				$order_total_cents,
-				$paid_amount
-			) );
+			// paid_amount ausente ou inconsistente — retorna 200 para evitar retry
+			// da InfinitePay e agenda verificação por cron como rede de segurança.
+			$this->logger->warning(
+				sprintf(
+					'Webhook: paid_amount inconsistente para pedido #%d (esperado %d centavos, recebido %d). Verificação por cron agendada.',
+					$order->get_id(),
+					$order_total_cents,
+					$paid_amount
+				)
+			);
 			wp_schedule_single_event( time() + 30, 'infinitepay_check_pending_payments' );
 		}
 
