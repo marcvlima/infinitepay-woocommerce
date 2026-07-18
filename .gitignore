@@ -27,3 +27,7 @@ composer.lock
 # Build artifacts
 /build/
 *.zip
+
+
+# APM dependencies
+apm_modules/

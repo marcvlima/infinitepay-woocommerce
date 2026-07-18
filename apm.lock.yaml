@@ -1,0 +1,48 @@
+lockfile_version: '1'
+generated_at: '2026-07-18T03:58:43.013647+00:00'
+apm_version: 0.23.1
+dependencies:
+- repo_url: marcvlima/holding-central-ai-assets
+  name: holding-central-ai-assets
+  host: github.com
+  resolved_commit: 6cc4d41ce27b7f51c7f6b2834797e0beb132d5cd
+  version: unknown
+  virtual_path: architecture-council
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .claude/skills/architecture-council
+  - .claude/skills/architecture-council/SKILL.md
+  - .claude/skills/architecture-council/references/output.md
+  - .claude/skills/architecture-council/references/process.md
+  - .claude/skills/architecture-council/references/roster.md
+  - .claude/skills/architecture-council/skill.json
+  deployed_file_hashes:
+    .claude/skills/architecture-council/SKILL.md: sha256:e266cef17a79960c72f133f1ad3ff99e3ad21bb4678585735edb141b46845f63
+    .claude/skills/architecture-council/references/output.md: sha256:e15976b146445a0d8a94e6cf385ad574e642c8d43d087d77d89585afc15c3909
+    .claude/skills/architecture-council/references/process.md: sha256:71609b1c1e61e4c8f6381ebf63f792913986ac706bbdf7b28efddee34ed8fa6e
+    .claude/skills/architecture-council/references/roster.md: sha256:e6cc66d00ca5d728b3cd8f1bcfbce436ee91789d164c1d18a3ecc5b467c23510
+    .claude/skills/architecture-council/skill.json: sha256:9f45e84f82d4c4a2491a5318e7c67523c984603c850c2aa7a1c66ea742333c2b
+  content_hash: sha256:c3a796559046ecd8a4f2eff27171d0955587458b04ed55e056163133edf03a07
+- repo_url: marcvlima/holding-central-ai-assets
+  name: holding-central-ai-assets
+  host: github.com
+  resolved_commit: 6cc4d41ce27b7f51c7f6b2834797e0beb132d5cd
+  version: unknown
+  virtual_path: product-taxonomy-council
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .claude/skills/product-taxonomy-council
+  - .claude/skills/product-taxonomy-council/SKILL.md
+  - .claude/skills/product-taxonomy-council/references/output.md
+  - .claude/skills/product-taxonomy-council/references/process.md
+  - .claude/skills/product-taxonomy-council/references/roster.md
+  - .claude/skills/product-taxonomy-council/skill.json
+  deployed_file_hashes:
+    .claude/skills/product-taxonomy-council/SKILL.md: sha256:e40b87477a7247b2cc8a96d667238fb421c7a8a22a4895aece8dacfda188f91a
+    .claude/skills/product-taxonomy-council/references/output.md: sha256:13a2895aec8d2596b2cb28453c8d858647ee66e6745b96b596bedaad356ac28a
+    .claude/skills/product-taxonomy-council/references/process.md: sha256:c670a8a5f6d5260d41c5d7ed607eb187df55b08c3f3234496e49914111794f80
+    .claude/skills/product-taxonomy-council/references/roster.md: sha256:2582b1371dd15a82fda20dca08f33ccd1011473e1f9a313b38396660c983e5a4
+    .claude/skills/product-taxonomy-council/skill.json: sha256:a0ac3b19eb162623feed4d0a80d2666834123216a60ac7d9f9db1ddc3f04f92f
+  content_hash: sha256:d6f22561b841a14daa6ea2658f02622af6e0322abc90792ce589bbd4eb9cba2b

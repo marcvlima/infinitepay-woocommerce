@@ -1,0 +1,50 @@
+{
+  "$schema": "https://schema.apm.dev/skill/v1.0.0",
+  "name": "product-taxonomy-council",
+  "displayName": "Product Taxonomy Council — Naming & Service Governance",
+  "packageId": "@holding-central-ai-assets/product-taxonomy-council",
+  "version": "1.2.1",
+  "description": "Convene a standing product-naming and taxonomy-governance council whenever a new product, service or feature is being named, an existing name is questioned, or the product/service catalog or taxonomy is touched. The Chief Product Architect always chairs; specialists (Product Taxonomy/Information Architect, Naming & Verbal-Identity Lead, Brand Architect, Platform/DevRel Strategist, Product Manager, Catalog/Governance Steward) brief on the business/positioning first, ground in the existing catalog and brand system, research PRIMARY sources on disciplined naming practice (AWS/GCP/Azure + IA/taxonomy + verbal-identity), generate meaningful non-trivial names (think outside the box, not dictionary-obvious), run 2 focused consensus rounds (diverge then converge; a Sonnet moderator synthesizes, the top-tier model stays executive), stay unbiased on rejection (produce fresh valid alternatives, never re-defend a rejected name), and converge to a naming decision, catalog entries, and an ADR-ready record.",
+  "author": "RiseGen AI",
+  "license": "MIT",
+  "repository": "https://github.com/marcvlima/holding-central-ai-assets",
+  "keywords": [
+    "naming",
+    "taxonomy",
+    "product-naming",
+    "service-naming",
+    "branding",
+    "brand-architecture",
+    "verbal-identity",
+    "catalog",
+    "governance",
+    "consensus",
+    "adr",
+    "risegen"
+  ],
+  "mainDocument": "SKILL.md",
+  "skillGuide": "SKILL.md",
+  "documents": {
+    "skillGuide": "SKILL.md",
+    "roster": "references/roster.md",
+    "process": "references/process.md",
+    "output": "references/output.md"
+  },
+  "usage": {
+    "aiAssistants": "MANDATORY to invoke before naming any new product/service/feature, before shipping a rename, or before touching the catalog/taxonomy; read SKILL.md, then run the phased session (ground + business/positioning brief -> primary-source research -> 2 consensus rounds [diverge, then converge], Sonnet moderates, top model executive, meaningful non-trivial names, unbiased on rejection -> naming decision + catalog entries + ADR-ready record).",
+    "engineers": "The council roster, the session protocol, and the naming-decision deliverable format.",
+    "founders": "A repeatable, senior naming and taxonomy-governance room that protects the ecosystem's product/service branding as it grows."
+  },
+  "apm": {
+    "type": "process-skill",
+    "category": "product-governance",
+    "tier": "core",
+    "compatibility": {
+      "minVersion": "1.0.0",
+      "platforms": ["vscode", "web", "api", "cli"]
+    }
+  },
+  "directories": {
+    "references": "references"
+  }
+}

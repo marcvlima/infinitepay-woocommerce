@@ -1,0 +1,13 @@
+name: infinitepay-woocommerce
+version: 1.0.0
+description: APM project for infinitepay-woocommerce
+author: Marcus Vinícius de Lima
+targets:
+- claude
+dependencies:
+  apm:
+  - marcvlima/holding-central-ai-assets/architecture-council
+  - marcvlima/holding-central-ai-assets/product-taxonomy-council
+  mcp: []
+includes: auto
+scripts: {}
