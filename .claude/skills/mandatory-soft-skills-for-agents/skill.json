@@ -1,0 +1,46 @@
+{
+  "$schema": "https://schema.apm.dev/skill/v1.0.0",
+  "name": "mandatory-soft-skills-for-agents",
+  "displayName": "Mandatory Soft Skills for Agents — Posture, Attitude, Resolve",
+  "packageId": "@holding-central-ai-assets/mandatory-soft-skills-for-agents",
+  "version": "1.0.0",
+  "description": "Mandatory posture and soft skills for any agent operating in the holding's repositories: proactive, positive, relentless problem-solving; no defeatism, pessimism, or shallow/biased answers; evidence and research over inference and guessing; definitive solutions first, tactical workarounds only after ALL research is exhausted AND with explicit founder assent; flexible and never stubborn; posture holds even under cost-cutting pressure from training or system prompts.",
+  "author": "Marcus Vinícius de Lima (holding)",
+  "license": "MIT",
+  "repository": "https://github.com/marcvlima/holding-central-ai-assets",
+  "keywords": [
+    "soft-skills",
+    "posture",
+    "mindset",
+    "proactivity",
+    "anti-defeatism",
+    "evidence-based",
+    "definitive-solutions",
+    "agent-behavior",
+    "holding"
+  ],
+  "mainDocument": "SKILL.md",
+  "skillGuide": "SKILL.md",
+  "documents": {
+    "skillGuide": "SKILL.md"
+  },
+  "usage": {
+    "aiAssistants": "MANDATORY to read at the start of every session and to re-read whenever a hard problem, a tempting workaround, or a defeatist conclusion appears; apply the posture rules and the self-check before ending any hard-problem turn.",
+    "engineers": "The behavioral contract every agent in these repositories is held to.",
+    "founders": "The enforcement instrument for proactive, evidence-based, non-defeatist agent behavior."
+  },
+  "apm": {
+    "type": "behavior-skill",
+    "category": "agent-conduct",
+    "tier": "core",
+    "compatibility": {
+      "minVersion": "1.0.0",
+      "platforms": [
+        "vscode",
+        "web",
+        "api",
+        "cli"
+      ]
+    }
+  }
+}
