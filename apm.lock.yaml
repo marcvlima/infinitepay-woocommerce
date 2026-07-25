@@ -62,3 +62,21 @@ dependencies:
     .claude/skills/mandatory-soft-skills-for-agents/SKILL.md: sha256:c872b4d867e8b202dba5340e38900451dbaa5e6f775bfbecbedb5b6d74fe3d80
     .claude/skills/mandatory-soft-skills-for-agents/skill.json: sha256:042c2aaa6fd6f25b28892c7aca5ee5c2430e8bad6bfc1e68dd1c4822d2c5d58e
   content_hash: sha256:b65fec62864e3084851a0ab8c2d9353779c3f16b78f92b916e4fa89edf9531cb
+- repo_url: marcvlima/holding-central-ai-assets
+  name: rise-flow
+  host: github.com
+  resolved_commit: dc194b38134aa83a4aff3e3393dcf7c77d4b6151
+  version: 1.0.0
+  virtual_path: rise-flow
+  is_virtual: true
+  package_type: claude_skill
+  deployed_files:
+  - .claude/skills/rise-flow
+  - .claude/skills/rise-flow/SKILL.md
+  - .claude/skills/rise-flow/references/c1-progressive-integration.md
+  - .claude/skills/rise-flow/skill.json
+  deployed_file_hashes:
+    .claude/skills/rise-flow/SKILL.md: sha256:d172f10d75e51cef64cfdccda007359fe68a7ce21dc0a0601f389603332cca9f
+    .claude/skills/rise-flow/references/c1-progressive-integration.md: sha256:5664102d65a014b9b9ce1fb28e88fa2d8ab5a58b931d3d3597332feda64952be
+    .claude/skills/rise-flow/skill.json: sha256:6be6fe883714b5f384e862eda8fdd86353de31f9eb6ca7e580eeffcecabfad4a
+  content_hash: sha256:b7b933cc85022eced71529394a2ede7d386e3bef2fc0bd921b6792a47484e380

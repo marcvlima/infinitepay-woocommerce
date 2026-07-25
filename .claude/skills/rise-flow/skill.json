@@ -1,0 +1,49 @@
+{
+  "$schema": "https://schema.apm.dev/skill/v1.0.0",
+  "name": "rise-flow",
+  "displayName": "Rise-Flow — Repository Integration & Branch Lifecycle Discipline",
+  "packageId": "@holding-central-ai-assets/rise-flow",
+  "version": "1.0.0",
+  "description": "The holding's generic, git-flow-like repository integration and branch/worktree lifecycle discipline. Capability 1 (Progressive Integration) prevents long-lived local/branch divergence from the upstream default branch before it snowballs: a mandatory pre-flight drift check at the start of any task, concrete drift budgets, escalate-don't-route-around on any blocker, multi-worktree/multi-clone awareness, and a diff-by-diff (never vibes-based) reconciliation procedure once a repo is already past budget. Designed to grow — new capabilities are added over time as additional reference docs under the same package.",
+  "author": "Marcus Vinícius de Lima (holding)",
+  "license": "MIT",
+  "repository": "https://github.com/marcvlima/holding-central-ai-assets",
+  "keywords": [
+    "git-flow",
+    "branch-lifecycle",
+    "worktree-hygiene",
+    "drift-prevention",
+    "progressive-integration",
+    "repo-discipline",
+    "agent-conduct",
+    "holding"
+  ],
+  "mainDocument": "SKILL.md",
+  "skillGuide": "SKILL.md",
+  "documents": {
+    "skillGuide": "SKILL.md",
+    "capability1ProgressiveIntegration": "references/c1-progressive-integration.md"
+  },
+  "usage": {
+    "aiAssistants": "Run Capability 1's pre-flight drift check at the start of any task in a git repository (or any of its worktrees), and before creating a new branch/worktree/clone for feature work. If the repo is past the drift budget, stop and surface the exact numbers before proceeding; reconcile per references/c1-progressive-integration.md's diff-by-diff procedure, never by assumption. Read the capability index in SKILL.md before adding any new capability to this package.",
+    "engineers": "The generic branch/worktree lifecycle discipline every agent-touched repository in the holding operates under, alongside memory-bank and session-handoff.",
+    "founders": "The standing mechanism that keeps agent-driven feature work from silently drifting away from the shared trunk across long sessions, multiple clones, and parallel worktrees."
+  },
+  "apm": {
+    "type": "process-skill",
+    "category": "repo-lifecycle",
+    "tier": "core",
+    "compatibility": {
+      "minVersion": "1.0.0",
+      "platforms": [
+        "vscode",
+        "web",
+        "api",
+        "cli"
+      ]
+    }
+  },
+  "directories": {
+    "references": "references"
+  }
+}
