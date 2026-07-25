@@ -1,0 +1,47 @@
+{
+  "$schema": "https://schema.apm.dev/skill/v1.0.0",
+  "name": "development-flow",
+  "displayName": "Development Flow — Rebuild & Redeploy Before Retest",
+  "packageId": "@holding-central-ai-assets/development-flow",
+  "version": "1.0.0",
+  "description": "Mandatory directive: after changing shared/infrastructure components (platform, connector, CLI, engine), rebuild and redeploy the affected artifacts before asking the user to test. Covers Go binaries, CLI tools consumed by VS Code/TUI, shared libraries, and the complete testing protocol — rebuild → redeploy → kill running process → retest signal. A code edit without redeploy is not yet testable.",
+  "author": "RiseGen AI (holding)",
+  "license": "MIT",
+  "repository": "https://github.com/marcvlima/holding-central-ai-assets",
+  "keywords": [
+    "development-flow",
+    "redeploy",
+    "rebuild",
+    "test-protocol",
+    "go-build",
+    "cli-workflow",
+    "dev-loop",
+    "agent-conduct",
+    "holding"
+  ],
+  "mainDocument": "SKILL.md",
+  "skillGuide": "SKILL.md",
+  "documents": {
+    "skillGuide": "SKILL.md"
+  },
+  "usage": {
+    "aiAssistants": "Read at the START of any session that makes changes across repositories or to shared/infrastructure components (platform, connector, CLI, engine). After every change that modifies an artifact consumed by another component, ensure the rebuild-and-redeploy sequence runs before the 'ready to test' signal. The skill is mandatory — a skip is a defect.",
+    "engineers": "The rebuild-and-redeploy protocol for Go binaries, CLI tools, shared libraries, and cross-repo changes.",
+    "founders": "The standing directive that forces agents to redeploy changed artifacts before asking for retest, closing the feedback loop and saving iterative cycles."
+  },
+  "apm": {
+    "type": "convention-skill",
+    "category": "development-workflow",
+    "tier": "core",
+    "compatibility": {
+      "minVersion": "1.0.0",
+      "platforms": [
+        "vscode",
+        "web",
+        "api",
+        "cli"
+      ]
+    }
+  },
+  "directories": {}
+}
