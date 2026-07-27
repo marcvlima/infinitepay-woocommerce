@@ -42,6 +42,6 @@ truth for this session:
 - Open questions flagged (to confirm with the user).
 
 Recommend (via the President) that, once decisions land, they be **promoted into real
-`brand` and `design-system` skills** in `designsystem-master` (or the brand's repo) so the
+`brand` and `design-system` skills** in the brand's repositories so the
 next session is grounded, not re-extracted. A new brand is defined **with** the user —
 never assumed by the agency.

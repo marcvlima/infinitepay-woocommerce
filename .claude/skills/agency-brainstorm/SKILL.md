@@ -83,8 +83,10 @@ At the start (Phase 0), establish the brand context:
   panel proposes anything. A new brand is defined *with* the user, not assumed.
 
 > At minimum, the brand skill and the design-system skill are expected to live in the
-> `designsystem-master` repo (or the consumer's `apm.yml`). When they exist, they are
+> brand's own repositories (or the consumer's `apm.yml`). When they exist, they are
 > mandatory inputs; when they don't, the intake creates the missing grounding.
+>
+> **Canonical home of this skill:** `holding-central-ai-assets` (`@holding-central-ai-assets/agency-brainstorm`).
 
 ## Flow (summary)
 
