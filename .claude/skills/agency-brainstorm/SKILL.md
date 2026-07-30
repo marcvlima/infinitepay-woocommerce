@@ -88,6 +88,16 @@ At the start (Phase 0), establish the brand context:
 >
 > **Canonical home of this skill:** `holding-central-ai-assets` (`@holding-central-ai-assets/agency-brainstorm`).
 
+## Relentless Method (MANDATORY — read references/relentless-method.md)
+
+Every session runs under the Relentless Method: grit before barriers (two
+alternatives before any "can't"), negative-claims quarantine (test, don't
+inherit), metrics interrogation (numbers carry their environment), iterative
+research until the result, pre-registered decision rules, an out-of-the-box
+round, veto alchemy, proactive validation on cheap executors, no lazy WATCH,
+and silent no-op hunting. A synthesis that violates these is not ready for
+the ratifier.
+
 ## Flow (summary)
 
 `references/process.md` has the full protocol. In short:
