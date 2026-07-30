@@ -1,0 +1,57 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "command -v abg-guard \u003e/dev/null 2\u003e\u00261 \u0026\u0026 exec abg-guard hook codex --event post-tool-use || sh \"$(git rev-parse --show-toplevel 2\u003e/dev/null || echo .)/.risegen/abg-bootstrap.sh\" hook codex --event post-tool-use",
+            "type": "command"
+          }
+        ],
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit|Bash"
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "command -v abg-guard \u003e/dev/null 2\u003e\u00261 \u0026\u0026 exec abg-guard hook codex --event pre-tool-use || sh \"$(git rev-parse --show-toplevel 2\u003e/dev/null || echo .)/.risegen/abg-bootstrap.sh\" hook codex --event pre-tool-use || printf '%s' '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"abg-guard unavailable — the ABG gate could not evaluate this call, so it is denied. Install the gate: `sh .risegen/abg-bootstrap.sh version` (needs `gh` authenticated), then register your work: `abg-guard register --item #\u003cissue\u003e`.\"}}'",
+            "type": "command"
+          }
+        ],
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit"
+      },
+      {
+        "hooks": [
+          {
+            "command": "command -v abg-guard \u003e/dev/null 2\u003e\u00261 \u0026\u0026 exec abg-guard hook codex --event pre-tool-use || sh \"$(git rev-parse --show-toplevel 2\u003e/dev/null || echo .)/.risegen/abg-bootstrap.sh\" hook codex --event pre-tool-use || printf '%s' '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"abg-guard unavailable — the ABG gate could not evaluate this call, so it is denied. Install the gate: `sh .risegen/abg-bootstrap.sh version` (needs `gh` authenticated), then register your work: `abg-guard register --item #\u003cissue\u003e`.\"}}'",
+            "type": "command"
+          }
+        ],
+        "matcher": "Bash"
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "command": "command -v abg-guard \u003e/dev/null 2\u003e\u00261 \u0026\u0026 exec abg-guard hook codex --event session-start || sh \"$(git rev-parse --show-toplevel 2\u003e/dev/null || echo .)/.risegen/abg-bootstrap.sh\" hook codex --event session-start",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "command": "command -v abg-guard \u003e/dev/null 2\u003e\u00261 \u0026\u0026 exec abg-guard hook codex --event stop || sh \"$(git rev-parse --show-toplevel 2\u003e/dev/null || echo .)/.risegen/abg-bootstrap.sh\" hook codex --event stop",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ]
+  }
+}

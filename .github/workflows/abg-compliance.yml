@@ -1,0 +1,143 @@
+name: abg-compliance
+
+on:
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  check-abg-references:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify the committed gate config matches the canonical manifest
+        env:
+          ABG_BASE_URL: https://dev.risegen.ai/abg
+        run: |
+          set -uo pipefail
+          if ! curl -sS --fail -m 20 "$ABG_BASE_URL/v1/guard/manifest" -o manifest.json; then
+            echo "::warning::ABG guard manifest unavailable — skipping the drift check"
+            exit 0
+          fi
+          if ! python3 -c "import json,sys; m=json.load(open('manifest.json')); sys.exit(0 if isinstance(m,dict) and 'hooks' in m and 'commit_msg_sha256' in m else 1)"; then
+            echo "::warning::ABG guard manifest is not in the expected shape — skipping the drift check"
+            exit 0
+          fi
+          python3 - <<'EOF'
+          import hashlib, json, os, sys
+
+          man = json.load(open("manifest.json"))
+          problems = []
+
+          def load(path):
+              try:
+                  with open(path) as fh:
+                      return json.load(fh)
+              except Exception as exc:
+                  problems.append(f"{path}: unreadable ({exc})")
+                  return None
+
+          configs = {}
+          for entry in man["hooks"]:
+              path = entry["file"]
+              if path not in configs:
+                  configs[path] = load(path)
+              cfg = configs[path]
+              if cfg is None:
+                  continue
+              hooks = (cfg.get("hooks") or {}).get(entry["event"]) or []
+              found = False
+              for group in hooks:
+                  if entry["matcher"] and group.get("matcher") != entry["matcher"]:
+                      continue
+                  leaves = group.get("hooks") or [group]
+                  for leaf in leaves:
+                      if leaf.get("command") == entry["command"]:
+                          found = True
+              if not found:
+                  problems.append(
+                      f"{path}: missing canonical hook entry event={entry['event']} "
+                      f"matcher={entry['matcher'] or '(none)'} harness={entry['harness']}"
+                  )
+
+          try:
+              digest = hashlib.sha256(open(".githooks/commit-msg", "rb").read()).hexdigest()
+              if digest != man["commit_msg_sha256"]:
+                  problems.append(".githooks/commit-msg differs from the canonical script")
+          except FileNotFoundError:
+              problems.append(".githooks/commit-msg is missing")
+
+          for p in problems:
+              print(f"::error::gate drift: {p}")
+          if problems:
+              print("::error::ABG gate drift detected - run 'abg-guard install' and commit the result")
+              sys.exit(1)
+          print(f"gate config matches manifest ({len(man['hooks'])} entries, commit-msg hash OK)")
+          EOF
+
+      - name: Verify every commit references a registered ABG item
+        id: check
+        env:
+          ABG_BASE_URL: https://dev.risegen.ai/abg
+        run: |
+          set -uo pipefail
+          base="${{ github.event.pull_request.base.sha }}"
+          head="${{ github.event.pull_request.head.sha }}"
+          failed=0
+          total=0
+          compliant=0
+          override=0
+
+          for sha in $(git rev-list "$base..$head"); do
+            total=$((total + 1))
+            msg=$(git log -1 --format=%B "$sha")
+
+            if echo "$msg" | grep -qE '^ABG-Override: .+'; then
+              reason=$(echo "$msg" | grep -E '^ABG-Override: ' | head -1 | sed 's/^ABG-Override: //')
+              echo "::notice::commit $sha uses ABG-Override: $reason"
+              override=$((override + 1))
+              continue
+            fi
+
+            ref=$(echo "$msg" | grep -E '^ABG: ' | head -1 | sed 's/^ABG: //')
+            if [ -z "$ref" ]; then
+              echo "::error::commit $sha has no 'ABG: #<issue>' trailer and no 'ABG-Override:' trailer"
+              failed=1
+              continue
+            fi
+
+            number=$(echo "$ref" | grep -oE '[0-9]+$')
+            resp=$(curl -sS -m 15 -X POST "$ABG_BASE_URL/v1/status/validate" \
+              -H 'Content-Type: application/json' \
+              -d "{\"number\": $number}")
+            stage=$(echo "$resp" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("stage",""))' 2>/dev/null || echo "")
+
+            if [ -z "$stage" ]; then
+              echo "::error::commit $sha references $ref but the ABG server could not validate it (response: $resp)"
+              failed=1
+              continue
+            fi
+            compliant=$((compliant + 1))
+            echo "commit $sha -> $ref (stage: $stage) OK"
+          done
+
+          echo "total=$total" >> "$GITHUB_OUTPUT"
+          echo "compliant=$compliant" >> "$GITHUB_OUTPUT"
+          echo "override=$override" >> "$GITHUB_OUTPUT"
+
+          if [ "$failed" -ne 0 ]; then
+            echo "::error::one or more commits are missing a valid ABG reference — see docs/plans/abg-enforcement-layer.md"
+            exit 1
+          fi
+
+      - name: Report compliance metrics to ABG
+        if: always()
+        env:
+          ABG_BASE_URL: https://dev.risegen.ai/abg
+        run: |
+          curl -sS -m 15 -X POST "$ABG_BASE_URL/v1/guard/compliance-report" \
+            -H 'Content-Type: application/json' \
+            -d "{\"repo\": \"${{ github.repository }}\", \"pr_number\": ${{ github.event.pull_request.number }}, \"kind\": \"pr_check\", \"total_commits\": ${{ steps.check.outputs.total }}, \"compliant_commits\": ${{ steps.check.outputs.compliant }}, \"override_commits\": ${{ steps.check.outputs.override }}}" \
+            || echo "::warning::could not report compliance metrics to ABG (non-fatal)"

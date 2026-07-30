@@ -1,0 +1,30 @@
+{
+  "hooks": {
+    "afterFileEdit": [
+      {
+        "command": "command -v abg-guard \u003e/dev/null 2\u003e\u00261 \u0026\u0026 exec abg-guard hook cursor --event after-edit || sh \"$(git rev-parse --show-toplevel 2\u003e/dev/null || echo .)/.risegen/abg-bootstrap.sh\" hook cursor --event after-edit"
+      }
+    ],
+    "beforeMCPExecution": [
+      {
+        "command": "command -v abg-guard \u003e/dev/null 2\u003e\u00261 \u0026\u0026 exec abg-guard hook cursor --event before-mcp || sh \"$(git rev-parse --show-toplevel 2\u003e/dev/null || echo .)/.risegen/abg-bootstrap.sh\" hook cursor --event before-mcp || printf '%s' '{\"permission\":\"deny\",\"agentMessage\":\"abg-guard unavailable — the ABG gate could not evaluate this call, so it is denied. Install the gate: `sh .risegen/abg-bootstrap.sh version` (needs `gh` authenticated), then register your work: `abg-guard register --item #\u003cissue\u003e`.\"}'"
+      }
+    ],
+    "beforeShellExecution": [
+      {
+        "command": "command -v abg-guard \u003e/dev/null 2\u003e\u00261 \u0026\u0026 exec abg-guard hook cursor --event before-shell || sh \"$(git rev-parse --show-toplevel 2\u003e/dev/null || echo .)/.risegen/abg-bootstrap.sh\" hook cursor --event before-shell || printf '%s' '{\"permission\":\"deny\",\"agentMessage\":\"abg-guard unavailable — the ABG gate could not evaluate this call, so it is denied. Install the gate: `sh .risegen/abg-bootstrap.sh version` (needs `gh` authenticated), then register your work: `abg-guard register --item #\u003cissue\u003e`.\"}'"
+      }
+    ],
+    "beforeSubmitPrompt": [
+      {
+        "command": "command -v abg-guard \u003e/dev/null 2\u003e\u00261 \u0026\u0026 exec abg-guard hook cursor --event before-submit || sh \"$(git rev-parse --show-toplevel 2\u003e/dev/null || echo .)/.risegen/abg-bootstrap.sh\" hook cursor --event before-submit"
+      }
+    ],
+    "stop": [
+      {
+        "command": "command -v abg-guard \u003e/dev/null 2\u003e\u00261 \u0026\u0026 exec abg-guard hook cursor --event stop || sh \"$(git rev-parse --show-toplevel 2\u003e/dev/null || echo .)/.risegen/abg-bootstrap.sh\" hook cursor --event stop"
+      }
+    ]
+  },
+  "version": 1
+}
