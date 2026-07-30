@@ -1,0 +1,20 @@
+#!/bin/sh
+# ABG enforcement backstop — rejects commits with no registered work item.
+# Installed by abg-guard install; see docs/plans/abg-enforcement-layer.md §3.
+msg_file="$1"
+
+if grep -qE '^ABG: (#[0-9]+|[A-Za-z0-9/_.-]+#[0-9]+)' "$msg_file"; then
+  # Call tier-check for SDD 0019 §4.5 compliance; tolerate missing binary
+  if command -v abg-guard >/dev/null 2>&1; then
+    abg-guard tier-check --msg "$msg_file" || exit $?
+  fi
+  exit 0
+fi
+if grep -qE '^ABG-Override: .+' "$msg_file"; then
+  exit 0
+fi
+
+echo "commit rejected: missing 'ABG: #<issue>' trailer (or 'ABG-Override: <reason>')." >&2
+echo "Register the work via A2A first, then add a trailer line, e.g.:" >&2
+echo "  ABG: #142" >&2
+exit 1

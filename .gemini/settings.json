@@ -1,0 +1,48 @@
+{
+  "hooks": {
+    "AfterTool": [
+      {
+        "hooks": [
+          {
+            "command": "command -v abg-guard \u003e/dev/null 2\u003e\u00261 \u0026\u0026 exec abg-guard hook gemini --event post-tool-use || sh \"$(git rev-parse --show-toplevel 2\u003e/dev/null || echo .)/.risegen/abg-bootstrap.sh\" hook gemini --event post-tool-use",
+            "type": "command"
+          }
+        ],
+        "matcher": "write_.*|edit_.*|run_shell_command"
+      }
+    ],
+    "BeforeTool": [
+      {
+        "hooks": [
+          {
+            "command": "command -v abg-guard \u003e/dev/null 2\u003e\u00261 \u0026\u0026 exec abg-guard hook gemini --event pre-tool-use || sh \"$(git rev-parse --show-toplevel 2\u003e/dev/null || echo .)/.risegen/abg-bootstrap.sh\" hook gemini --event pre-tool-use || printf '%s' '{\"decision\":\"block\",\"reason\":\"abg-guard unavailable — the ABG gate could not evaluate this call, so it is denied. Install the gate: `sh .risegen/abg-bootstrap.sh version` (needs `gh` authenticated), then register your work: `abg-guard register --item #\u003cissue\u003e`.\"}'",
+            "type": "command"
+          }
+        ],
+        "matcher": "write_.*|edit_.*|run_shell_command"
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "command": "command -v abg-guard \u003e/dev/null 2\u003e\u00261 \u0026\u0026 exec abg-guard hook gemini --event stop || sh \"$(git rev-parse --show-toplevel 2\u003e/dev/null || echo .)/.risegen/abg-bootstrap.sh\" hook gemini --event stop",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "command": "command -v abg-guard \u003e/dev/null 2\u003e\u00261 \u0026\u0026 exec abg-guard hook gemini --event session-start || sh \"$(git rev-parse --show-toplevel 2\u003e/dev/null || echo .)/.risegen/abg-bootstrap.sh\" hook gemini --event session-start",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ]
+  }
+}
